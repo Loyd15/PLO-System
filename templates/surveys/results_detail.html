@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Assessment #{{ assessment.assessment_id }}</title>
+</head>
+<body>
+  <p><a href="{% url 'surveys:results_list' %}">&larr; Back to Results</a></p>
+
+  <h1>Assessment #{{ assessment.assessment_id }}</h1>
+
+  <table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+      <td><strong>Student Name</strong></td>
+      <td>{{ respondent.name }}</td>
+    </tr>
+    <tr>
+      <td><strong>Student Number</strong></td>
+      <td>{{ respondent.student_number }}</td>
+    </tr>
+    <tr>
+      <td><strong>Degree Program</strong></td>
+      <td>{{ degree.degree_program }} ({{ degree.level_display }})</td>
+    </tr>
+    <tr>
+      <td><strong>College / Dept</strong></td>
+      <td>{{ degree.college }} - {{ degree.department }}</td>
+    </tr>
+    <tr>
+      <td><strong>Evaluator</strong></td>
+      <td>{{ assessment.evaluator_name|default:"—" }}</td>
+    </tr>
+    <tr>
+      <td><strong>Role</strong></td>
+      <td>{{ role.name }}</td>
+    </tr>
+    <tr>
+      <td><strong>Basis</strong></td>
+      <td>{{ assessment.basis|default:"—" }}</td>
+    </tr>
+    <tr>
+      <td><strong>Date Submitted</strong></td>
+      <td>{{ assessment.assessment_date|date:"Y-m-d H:i:s" }}</td>
+    </tr>
+    <tr>
+      <td><strong>Average Rating</strong></td>
+      <td>{{ avg_rating|default:"—" }}</td>
+    </tr>
+    <tr>
+      <td><strong>General Remarks</strong></td>
+      <td>{{ assessment.general_comment|default:"—" }}</td>
+    </tr>
+  </table>
+
+  <h2>Answers ({{ total_answers }} items)</h2>
+
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>PLO Code</th>
+        <th>Question</th>
+        <th>Rating</th>
+        <th>Rating Text</th>
+        <th>Reason / Comment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in detailed_answers %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>
+            {% for code in item.plo_codes %}
+              {{ code }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              —
+            {% endfor %}
+          </td>
+          <td>{{ item.question_text }}</td>
+          <td>{{ item.rating|default:"N/E" }}</td>
+          <td>{{ item.rating_text }}</td>
+          <td>{{ item.comment|default:"—" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <br>
+  <p><a href="{% url 'surveys:results_list' %}">&larr; Back to Results</a></p>
+</body>
+</html>

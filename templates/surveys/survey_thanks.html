@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assessment Submitted - PLO Survey</title>
+  <link rel="stylesheet" href="{% static 'css/survey.css' %}">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="logo-badge">[L]</div>
+        <span class="university-title">[University]</span>
+      </div>
+      <div class="header-title">PLO Survey</div>
+      <div></div>
+    </div>
+  </header>
+
+  <main class="app-main" style="display: flex; align-items: center; justify-content: center;">
+    <div class="thanks-container">
+      <div class="thanks-card">
+        <div class="thanks-icon-wrap">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h1 class="thanks-title">Thank you! Your response was submitted.</h1>
+        <p class="thanks-meta">
+          <strong>{{ degree.degree_program }}</strong> ({{ degree.level_display }}) · SY 2026–2027<br>
+          You can safely close this page.
+        </p>
+        <div class="thanks-actions">
+          <a href="/?degree_id={{ degree.degree_id }}&role_id={{ role.role_id }}" class="btn-primary">
+            Rate another student
+          </a>
+        </div>
+        <p class="thanks-subtext" style="margin-top: 12px;">
+          Rating more than one student? Start a new response for each one. Your role and program stay selected.
+        </p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

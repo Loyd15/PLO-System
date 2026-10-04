@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Student Assessment Results</title>
+</head>
+<body>
+  {% if assessments %}
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Student</th>
+          <th>Student ID</th>
+          <th>Program</th>
+          <th>Evaluator</th>
+          <th>Role</th>
+          <th>Basis</th>
+          <th>Avg Rating</th>
+          <th>Items</th>
+          <th>Remarks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in assessments %}
+          <tr>
+            <td>{{ a.assessment_id }}</td>
+            <td>{{ a.assessment_date|date:"Y-m-d H:i" }}</td>
+            <td>{{ a.respondent.name }}</td>
+            <td>{{ a.respondent.student_number }}</td>
+            <td>{{ a.respondent.degree.degree_program }} ({{ a.respondent.degree.degree_level }})</td>
+            <td>{{ a.evaluator_name|default:"—" }}</td>
+            <td>{{ a.role.name }}</td>
+            <td>{{ a.basis|default:"—" }}</td>
+            <td>{{ a.avg_rating|floatformat:1|default:"—" }}</td>
+            <td>{{ a.answers_count }}</td>
+            <td>{{ a.general_comment|default:"—" }}</td>
+            <td><a href="{% url 'surveys:results_detail' a.assessment_id %}">View</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <table border="1" cellpadding="5" cellspacing="0">
+      <tr>
+        <td>No assessment results found.</td>
+      </tr>
+    </table>
+  {% endif %}
+</body>
+</html>

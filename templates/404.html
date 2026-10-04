@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page Not Found (404) - PLO Survey</title>
+  <link rel="stylesheet" href="{% static 'css/survey.css' %}">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="logo-badge">[L]</div>
+        <span class="university-title">[University]</span>
+      </div>
+      <div class="header-title">PLO Survey</div>
+      <div></div>
+    </div>
+  </header>
+
+  <main class="app-main" style="display: flex; align-items: center; justify-content: center; padding: 48px 16px;">
+    <div class="thanks-container">
+      <div class="thanks-card">
+        <div class="thanks-icon-wrap" style="background: #FEE2E2;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h1 class="thanks-title" style="font-size: 26px;">404 - Page Not Found</h1>
+        <p class="thanks-meta">
+          The page or survey resource you are looking for doesn't exist or may have been moved.
+        </p>
+        <div class="thanks-actions" style="margin-top: 14px;">
+          <a href="{% url 'surveys:survey_form' %}" class="btn-primary">
+            Return to Assessment Form
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

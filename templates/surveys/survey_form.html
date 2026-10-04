@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Program Learning Outcome Assessment</title>
+  <link rel="stylesheet" href="{% static 'css/survey.css' %}">
+</head>
+<body>
+  <!-- CSRF Token for Secure AJAX Submission -->
+  {% csrf_token %}
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="logo-badge">[L]</div>
+        <span class="university-title">[University]</span>
+      </div>
+      <div class="header-title">PLO Survey</div>
+      <div></div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-labels">
+        <span id="step-title" class="progress-step-title">Your details</span>
+        <span id="step-count" class="progress-step-count">Step 1 of 8</span>
+      </div>
+      <div id="progress-segments" class="progress-segments">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Scrollable Content -->
+  <main class="app-main">
+    <div class="main-content">
+      
+      <!-- STEP 0: DETAILS -->
+      <div id="step-details" style="display: flex; flex-direction: column; gap: 14px;">
+        
+        <!-- Hero Banner -->
+        <section class="hero-banner">
+          <span class="hero-tag">SY 2026–2027</span>
+          <h1 class="hero-heading">Program Learning Outcome Assessment</h1>
+          <svg class="hero-illustration" width="96" height="104" viewBox="0 0 96 104" fill="none" aria-hidden="true">
+            <rect x="14" y="14" width="66" height="86" rx="6" fill="#2E6A51"></rect>
+            <rect x="20" y="22" width="54" height="74" rx="3" fill="#F4F8F5"></rect>
+            <rect x="34" y="8" width="26" height="14" rx="4" fill="#9CC3AE"></rect>
+            <circle cx="30" cy="38" r="4" fill="#1F4D3A"></circle>
+            <rect x="38" y="35" width="28" height="6" rx="3" fill="#C9DCD1"></rect>
+            <circle cx="30" cy="54" r="4" fill="#1F4D3A"></circle>
+            <rect x="38" y="51" width="22" height="6" rx="3" fill="#C9DCD1"></rect>
+            <circle cx="30" cy="70" r="4" fill="none" stroke="#9CC3AE" stroke-width="2"></circle>
+            <rect x="38" y="67" width="26" height="6" rx="3" fill="#E1ECE5"></rect>
+          </svg>
+        </section>
+
+        <!-- Degree Program Card -->
+        <section class="card">
+          <h2 class="card-title">Degree program</h2>
+          <div class="degree-selector-grid">
+            <div class="form-group">
+              <label for="d-college" class="form-label">College</label>
+              <select id="d-college" class="form-select">
+                <option value="">Select college</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="d-dept" class="form-label">Department</label>
+              <select id="d-dept" class="form-select" disabled>
+                <option value="">Select a college first</option>
+              </select>
+            </div>
+            <div class="form-group form-group-level">
+              <label for="d-level" class="form-label">Degree level</label>
+              <select id="d-level" class="form-select" disabled>
+                <option value="">Select a department first</option>
+              </select>
+            </div>
+            <div class="form-group form-group-program">
+              <label for="d-prog" class="form-label">Degree program</label>
+              <select id="d-prog" class="form-select" disabled>
+                <option value="">Select a degree level first</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Desktop 2-Column Section: Evaluator (Left) & Student (Right) -->
+        <div class="desktop-form-grid">
+          
+          <!-- Column Left: Evaluator & Context -->
+          <div class="desktop-form-col">
+            <!-- About You Card -->
+            <section class="card">
+              <h2 class="card-title">About you</h2>
+              <div class="form-group">
+                <label for="d-ename" class="form-label">Your full name</label>
+                <input id="d-ename" class="form-input" type="text" autocomplete="name" placeholder="First name Last name">
+              </div>
+              <fieldset style="border: none; margin: 0; padding: 0;">
+                <legend class="form-label" style="margin-bottom: 6px;">I am answering as a…</legend>
+                <div class="radio-list">
+                  {% for role in roles %}
+                    <button type="button" class="custom-radio role-radio-btn" role="radio" aria-checked="false" data-role-id="{{ role.role_id }}" data-role-name="{{ role.name }}">
+                      <span class="radio-indicator">
+                        <span class="radio-dot" style="display: none;"></span>
+                      </span>
+                      <span class="radio-label">{{ role.name }}</span>
+                    </button>
+                  {% endfor %}
+                </div>
+              </fieldset>
+            </section>
+
+            <!-- Basis of Assessment Card (Conditional for Evaluators) -->
+            <section id="basis-section" class="card">
+              <fieldset style="border: none; margin: 0; padding: 0;">
+                <legend class="card-title" style="margin-bottom: 4px;">Basis of this assessment</legend>
+                <p class="card-subtitle">Pre-selected from your role. Change it if based on something else.</p>
+                <div class="radio-list">
+                  <button type="button" class="custom-radio basis-radio-btn" role="radio" aria-checked="false" data-basis="Thesis">
+                    <span class="radio-indicator"><span class="radio-dot" style="display: none;"></span></span>
+                    <span class="radio-label">Thesis</span>
+                  </button>
+                  <button type="button" class="custom-radio basis-radio-btn" role="radio" aria-checked="false" data-basis="Capstone project">
+                    <span class="radio-indicator"><span class="radio-dot" style="display: none;"></span></span>
+                    <span class="radio-label">Capstone project</span>
+                  </button>
+                  <button type="button" class="custom-radio basis-radio-btn" role="radio" aria-checked="false" data-basis="Internship">
+                    <span class="radio-indicator"><span class="radio-dot" style="display: none;"></span></span>
+                    <span class="radio-label">Internship</span>
+                  </button>
+                </div>
+              </fieldset>
+            </section>
+          </div>
+
+          <!-- Column Right: Student Details -->
+          <div class="desktop-form-col">
+            <section class="card">
+              <h2 id="student-card-title" class="card-title">About the student</h2>
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div id="student-name-group" class="form-group">
+                  <label for="d-sname" class="form-label">Student’s full name</label>
+                  <input id="d-sname" class="form-input" type="text" autocomplete="off" placeholder="First name Last name">
+                </div>
+                <div class="form-group">
+                  <label id="id-label" for="d-sid" class="form-label">Student’s ID number</label>
+                  <input id="d-sid" class="form-input" type="text" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="e.g. 12212345" style="letter-spacing: 0.06em;">
+                  <p id="id-partial-msg" class="error-message" style="display: none;">Enter all 8 digits of the ID number.</p>
+                </div>
+                <div class="form-group">
+                  <label id="ay-label" for="d-ay" class="form-label">Academic year the student started their current program</label>
+                  <select id="d-ay" class="form-select">
+                    <option value="">Select academic year</option>
+                    {% for ay in academic_years %}
+                      <option value="{{ ay }}">{{ ay }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <p id="ay-help" class="form-hint">If the student shifted programs, choose the year they started this one.</p>
+              </div>
+            </section>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- STEP 1..N: DYNAMIC QUESTION / OUTCOME RATING -->
+      <div id="step-question" style="display: none; flex-direction: column; gap: 16px;">
+        <!-- Injected dynamically by survey.js -->
+      </div>
+
+      <!-- STEP REVIEW: SUMMARY AND SUBMISSION -->
+      <div id="step-review" style="display: none; flex-direction: column; gap: 18px;">
+        <div class="review-header">
+          <h1 class="review-title">Review your assessment</h1>
+          <p class="review-subtitle">Check everything before submitting. Click Edit to change an answer.</p>
+        </div>
+
+        <div class="review-grid-desktop">
+          <!-- Left Column: Details Summary Card & Remarks -->
+          <div class="review-col-details">
+            <section class="card">
+              <div class="card-header-with-action">
+                <h2 class="card-title">Assessment Details</h2>
+                <button id="btn-edit-details" type="button" class="btn-edit">Edit</button>
+              </div>
+              <div id="review-details-summary">
+                <!-- Injected by JavaScript -->
+              </div>
+            </section>
+
+            <!-- General Comments Card -->
+            <section class="card" style="margin-top: 16px;">
+              <label for="d-comment" class="card-title">General remarks <span style="font-weight: 400; color: #5F6B65;">(optional)</span></label>
+              <p class="card-subtitle">Additional observations regarding strengths or areas for development:</p>
+              <textarea id="d-comment" class="form-textarea" rows="4" maxlength="1000" placeholder="Type comments here..."></textarea>
+            </section>
+          </div>
+
+          <!-- Right Column: Ratings Summary Card -->
+          <div class="review-col-ratings">
+            <section class="card">
+              <h2 class="card-title" style="margin-bottom: 12px;">Outcome Ratings</h2>
+              <div id="review-ratings-summary">
+                <!-- Injected by JavaScript -->
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <p class="form-hint" style="padding: 0 4px; font-size: 13px;">
+          By submitting, you agree to the <a href="#" style="color: var(--color-primary); font-weight: 700;">[University] Data Privacy Notice</a>.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Sticky Footer Action Bar -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div id="footer-hint" class="footer-hint"></div>
+      <div class="footer-actions">
+        <button id="btn-back" type="button" class="btn-back" style="display: none;">Back</button>
+        <button id="btn-next" type="button" class="btn-primary">Start rating</button>
+        <button id="btn-submit" type="button" class="btn-primary" style="display: none;">Confirm &amp; submit</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Server-Provided Data -->
+  <script>
+    window.SURVEY_HIERARCHY = {{ hierarchy_json|safe }};
+    window.INITIAL_DEGREE_ID = "{{ selected_degree_id }}";
+    window.INITIAL_ROLE_ID = "{{ selected_role_id }}";
+    window.INITIAL_QUESTIONS = {{ initial_questions_json|safe }};
+  </script>
+  <script src="{% static 'js/survey.js' %}"></script>
+</body>
+</html>
