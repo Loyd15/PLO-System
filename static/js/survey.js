@@ -24,6 +24,8 @@
 
   // State
   var state = {
+    hasConsented: false,
+    consentSwitchOn: false,
     step: 0,
     fromReview: false,
     college: '',
@@ -49,6 +51,10 @@
 
   // DOM Elements
   var els = {
+    consentModal: document.getElementById('consent-modal'),
+    consentToggleCard: document.getElementById('consent-toggle-card'),
+    consentToggleBtn: document.getElementById('consent-toggle'),
+    btnConsentContinue: document.getElementById('btn-consent-continue'),
     collegeSelect: document.getElementById('d-college'),
     deptSelect: document.getElementById('d-dept'),
     levelSelect: document.getElementById('d-level'),
@@ -84,6 +90,7 @@
 
   // Initialize
   function init() {
+    setupConsentModal();
     setupCascadingDropdowns();
     setupRoleAndBasis();
     setupInputListeners();
@@ -110,10 +117,49 @@
     renderUI();
   }
 
+  // --- INFORMED CONSENT POPUP ---
+  function setupConsentModal() {
+    if (!els.consentModal) {
+      state.hasConsented = true;
+      return;
+    }
+
+    function toggleConsentSwitch(e) {
+      if (e) e.stopPropagation();
+      state.consentSwitchOn = !state.consentSwitchOn;
+      if (els.consentToggleBtn) {
+        els.consentToggleBtn.classList.toggle('active', state.consentSwitchOn);
+        els.consentToggleBtn.setAttribute('aria-checked', state.consentSwitchOn ? 'true' : 'false');
+      }
+      if (els.btnConsentContinue) {
+        els.btnConsentContinue.disabled = !state.consentSwitchOn;
+      }
+    }
+
+    if (els.consentToggleBtn) {
+      els.consentToggleBtn.addEventListener('click', toggleConsentSwitch);
+    }
+    if (els.consentToggleCard) {
+      els.consentToggleCard.addEventListener('click', toggleConsentSwitch);
+    }
+    if (els.btnConsentContinue) {
+      els.btnConsentContinue.addEventListener('click', function () {
+        if (!state.consentSwitchOn) return;
+        state.hasConsented = true;
+        els.consentModal.style.display = 'none';
+      });
+    }
+  }
+
   // --- CASCADING DROPDOWNS ---
   function populateColleges() {
     var hierarchy = window.SURVEY_HIERARCHY || {};
-    var colleges = Object.keys(hierarchy).sort();
+    var colleges = Object.keys(hierarchy).filter(function (c) {
+      var depts = hierarchy[c] || {};
+      return Object.keys(depts).some(function (d) {
+        return Array.isArray(depts[d]) && depts[d].length > 0;
+      });
+    }).sort();
 
     els.collegeSelect.innerHTML = '<option value="">Select college</option>';
     colleges.forEach(function (c) {
@@ -142,7 +188,9 @@
 
       if (state.college && hierarchy[state.college]) {
         els.deptSelect.disabled = false;
-        var depts = Object.keys(hierarchy[state.college]).sort();
+        var depts = Object.keys(hierarchy[state.college]).filter(function (d) {
+          return Array.isArray(hierarchy[state.college][d]) && hierarchy[state.college][d].length > 0;
+        }).sort();
         depts.forEach(function (d) {
           var opt = document.createElement('option');
           opt.value = d;
@@ -671,11 +719,16 @@
     tagsWrap.className = 'plo-tags-container';
 
     var ploCodes = q.plo_codes || [];
+    var ploDetails = q.plo_details || [];
     if (ploCodes.length > 0) {
-      ploCodes.forEach(function (code) {
+      ploCodes.forEach(function (code, idx) {
         var tag = document.createElement('span');
         tag.className = 'plo-tag';
         tag.textContent = code;
+        if (ploDetails[idx] && ploDetails[idx].description) {
+          tag.dataset.ploCode = ploDetails[idx].code;
+          tag.dataset.ploDescription = ploDetails[idx].description;
+        }
         tagsWrap.appendChild(tag);
       });
       if (ploCodes.length > 1) {
@@ -693,9 +746,10 @@
     qText.textContent = q.question_text;
     meta.appendChild(qText);
 
-    // Desktop guidance note
+    // Desktop guidance / PLO description box (hidden for now; reserved for future clickable PLO tags)
     var guideBox = document.createElement('div');
     guideBox.className = 'question-guide-box';
+    guideBox.style.display = 'none';
     guideBox.innerHTML = '<span class="guide-title">Assessment Guidance</span>' +
       '<p class="guide-text">Evaluate the student’s demonstrated proficiency for this outcome using the 1–5 rating options.</p>';
     meta.appendChild(guideBox);

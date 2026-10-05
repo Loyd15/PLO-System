@@ -1,20 +1,27 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from surveys.models import Degree, AssessmentRole, Respondent, Assessment, Plo, Question, QuestionPlo, Answer
-from surveys.services import get_survey_questions_for_degree
+from surveys.services import get_degree_hierarchy, get_survey_questions_for_degree
 
 
 class SurveySystemTests(TestCase):
     def setUp(self):
         self.client = Client()
-        # Create Degree for test
+        # Create Degree for test (with PLOs)
         self.degree = Degree.objects.create(
             college='College of Computer Studies (CCS)',
             department='Department of Information Technology',
             degree_level='UG',
             degree_program='Bachelor of Science in Information Systems'
         )
-        # Create PLOs for this degree
+        # Create Degree without PLOs (should be hidden from hierarchy)
+        self.empty_degree = Degree.objects.create(
+            college='College without PLOs',
+            department='Empty Department',
+            degree_level='UG',
+            degree_program='Bachelor of Science in Empty Studies'
+        )
+        # Create PLOs for this degree (single digit 'PLO 1' auto-normalizes to 'PLO 01')
         self.plo1 = Plo.objects.create(
             degree=self.degree,
             code='PLO 1',
@@ -28,12 +35,17 @@ class SurveySystemTests(TestCase):
         # Create role
         self.role = AssessmentRole.objects.create(name='Thesis adviser')
 
-    def test_survey_form_renders(self):
+    def test_survey_form_renders_and_filters_empty_degrees(self):
         response = self.client.get(reverse('surveys:survey_form'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Program Learning Outcome Assessment')
-        self.assertContains(response, 'PLO Survey')
+        self.assertContains(response, 'De La Salle University')
+        self.assertContains(response, 'Before you begin')
         self.assertContains(response, 'window.SURVEY_HIERARCHY')
+
+        hierarchy = get_degree_hierarchy()
+        self.assertIn('College of Computer Studies (CCS)', hierarchy)
+        self.assertNotIn('College without PLOs', hierarchy)
 
     def test_api_questions_plo_is_question(self):
         response = self.client.get(reverse('surveys:api_questions'), {'degree_id': self.degree.degree_id})
@@ -42,10 +54,10 @@ class SurveySystemTests(TestCase):
         self.assertIn('questions', data)
         self.assertEqual(len(data['questions']), 2)
         
-        # Check first question is PLO itself
+        # Check first question is PLO itself and formatted as PLO 01
         q1 = data['questions'][0]
         self.assertEqual(q1['question_text'], self.plo1.description)
-        self.assertIn('PLO 1', q1['plo_codes'])
+        self.assertIn('PLO 01', q1['plo_codes'])
         self.assertTrue(q1['is_plo_itself'])
 
     def test_question_belonging_to_several_plos(self):
@@ -61,8 +73,8 @@ class SurveySystemTests(TestCase):
         found = next((q for q in questions if q['question_id'] == multi_q.question_id), None)
         self.assertIsNotNone(found)
         self.assertEqual(len(found['plo_codes']), 2)
-        self.assertIn('PLO 1', found['plo_codes'])
-        self.assertIn('PLO 2', found['plo_codes'])
+        self.assertIn('PLO 01', found['plo_codes'])
+        self.assertIn('PLO 02', found['plo_codes'])
         self.assertFalse(found['is_plo_itself'])
 
     def test_survey_submission_and_thanks(self):
@@ -166,5 +178,5 @@ class SurveySystemTests(TestCase):
         self.assertContains(resp_detail, 'Outstanding algorithmic analysis.')
         self.assertContains(resp_detail, 'Analytical problem formulation.')
         self.assertContains(resp_detail, 'Exceptional')
-        self.assertContains(resp_detail, 'PLO 1')
+        self.assertContains(resp_detail, 'PLO 01')
 

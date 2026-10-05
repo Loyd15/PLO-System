@@ -6,8 +6,13 @@ from .models import Degree, AssessmentRole, Respondent, Assessment, Plo, Questio
 def get_degree_hierarchy():
     """
     Returns the college -> department -> degree programs tree.
+    Only includes colleges, departments, and degree programs that have at least one PLO.
     """
-    degrees = Degree.objects.all().order_by('college', 'department', 'degree_program')
+    degrees = (
+        Degree.objects.filter(plos__isnull=False)
+        .distinct()
+        .order_by('college', 'department', 'degree_program')
+    )
     hierarchy = {}
     for deg in degrees:
         c = deg.college
@@ -30,9 +35,9 @@ def get_survey_questions_for_degree(degree):
     - If specific questions are already linked to the degree's PLOs via QuestionPlo, return them.
     - Otherwise, since 'sometimes the question is the PLO itself', automatically ensure each PLO
       has a Question row with question_text = plo.description, and link it in QuestionPlo.
-    Each returned question object is annotated with its related PLO codes for this degree.
+    Each returned question object is annotated with its related PLO codes and descriptions for this degree.
     """
-    plos = list(Plo.objects.filter(degree=degree).order_by('plo_id'))
+    plos = list(Plo.objects.filter(degree=degree).order_by('code', 'plo_id'))
     if not plos:
         return []
 
@@ -58,7 +63,6 @@ def get_survey_questions_for_degree(degree):
             question_list.append(q)
 
     # Attach PLO metadata specific to this degree for display
-    plo_map = {p.plo_id: p for p in plos}
     results = []
     for q in question_list:
         # Find which PLOs of THIS degree this question links to (handles many-to-many!)
@@ -66,15 +70,20 @@ def get_survey_questions_for_degree(degree):
         if not q_plos:
             # fallback if not yet prefetched
             q_plos = list(q.plos.filter(degree=degree))
-        
+        q_plos.sort(key=lambda p: p.code)
+
         plo_codes = [p.code for p in q_plos]
+        plo_details = [{'code': p.code, 'description': p.description} for p in q_plos]
         results.append({
             'question_id': q.question_id,
             'question_text': q.question_text,
             'plo_codes': plo_codes,
+            'plo_details': plo_details,
             'plo_codes_display': ", ".join(plo_codes) if plo_codes else "General PLO",
             'is_plo_itself': len(q_plos) == 1 and q.question_text == q_plos[0].description,
         })
+
+    results.sort(key=lambda item: (item['plo_codes'][0] if item['plo_codes'] else 'ZZZ', item['question_id']))
     return results
 
 

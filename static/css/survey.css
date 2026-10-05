@@ -84,6 +84,169 @@ body {
   font-size: 11px;
 }
 
+.university-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Informed Consent & Data Privacy Modal Popup */
+.consent-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(20, 30, 25, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.consent-modal-dialog {
+  background: var(--color-bg);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(20, 30, 25, 0.25);
+  max-width: 500px;
+  width: 100%;
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+
+.consent-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.consent-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text-main);
+  line-height: 1.25;
+}
+
+.consent-subtitle {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.consent-info-card {
+  padding: 22px 24px;
+  gap: 18px;
+}
+
+.consent-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.consent-section-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+
+.consent-section-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.consent-divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  width: 100%;
+}
+
+.consent-privacy-link {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: underline;
+  line-height: 1.45;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.consent-privacy-link:hover {
+  color: var(--color-primary-hover);
+}
+
+.card.consent-agree-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.consent-switch {
+  width: 52px;
+  height: 30px;
+  border-radius: 15px;
+  background: #B8C2BC;
+  border: none;
+  padding: 3px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.consent-switch.active {
+  background: var(--color-primary);
+}
+
+.consent-switch-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  transition: transform 0.2s ease;
+  display: block;
+}
+
+.consent-switch.active .consent-switch-thumb {
+  transform: translateX(22px);
+}
+
+.consent-agree-text {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text-main);
+}
+
+.consent-actions {
+  display: flex;
+  width: 100%;
+}
+
+.consent-actions .btn-primary {
+  width: 100%;
+}
+
 .university-title {
   font-size: 15px;
   font-weight: 700;
@@ -337,9 +500,10 @@ body {
 
 .form-textarea {
   height: auto;
+  min-height: 92px;
   padding: 12px 14px;
   line-height: 1.5;
-  resize: vertical;
+  resize: none;
 }
 
 .input-error {
@@ -632,6 +796,7 @@ body {
 }
 
 .question-guide-box {
+  display: none; /* Hidden for now; reserved for future clickable PLO description display */
   background: #F4F8F5;
   border: 1px solid var(--color-primary-border);
   border-radius: 8px;

@@ -138,6 +138,7 @@ def survey_thanks_view(request, assessment_id):
 
 
 RATING_SCALE = {
+    0: {'text': 'Not enough info / experience', 'badge_class': 'badge-rating-ne'},
     1: {'text': 'Strongly Disagree', 'badge_class': 'badge-rating-1'},
     2: {'text': 'Disagree', 'badge_class': 'badge-rating-2'},
     3: {'text': 'Neutral', 'badge_class': 'badge-rating-3'},
@@ -159,7 +160,7 @@ def results_list_view(request):
         'role'
     ).annotate(
         answers_count=Count('answers'),
-        avg_rating=Avg('answers__rating'),
+        avg_rating=Avg('answers__rating', filter=Q(answers__rating__gte=1)),
     ).order_by('-assessment_date')
 
     if degree_id.isdigit():
@@ -178,11 +179,11 @@ def results_list_view(request):
     total_submissions = assessments.count()
     distinct_students = assessments.values('respondent__student_number').distinct().count()
 
-    overall_avg = assessments.aggregate(overall_avg=Avg('answers__rating'))['overall_avg']
+    overall_avg = assessments.aggregate(overall_avg=Avg('answers__rating', filter=Q(answers__rating__gte=1)))['overall_avg']
     if overall_avg is not None:
         overall_avg = round(float(overall_avg), 2)
 
-    degrees = Degree.objects.all().order_by('degree_program')
+    degrees = Degree.objects.filter(plos__isnull=False).distinct().order_by('degree_program')
     roles = AssessmentRole.objects.all().order_by('name')
 
     context = {
@@ -221,11 +222,11 @@ def results_detail_view(request, assessment_id):
 
     for ans in answers:
         rating_info = RATING_SCALE.get(ans.rating, {'text': f'Rating {ans.rating}', 'badge_class': ''})
-        plo_codes = [plo.code for plo in ans.question.plos.all() if plo.degree_id == assessment.respondent.degree_id]
+        plo_codes = sorted([plo.code for plo in ans.question.plos.all() if plo.degree_id == assessment.respondent.degree_id])
         if not plo_codes:
-            plo_codes = [plo.code for plo in ans.question.plos.all()]
+            plo_codes = sorted([plo.code for plo in ans.question.plos.all()])
 
-        if ans.rating is not None:
+        if ans.rating is not None and ans.rating >= 1:
             total_ratings += 1
             rating_sum += ans.rating
 
@@ -239,6 +240,9 @@ def results_detail_view(request, assessment_id):
             'comment': ans.comment,
             'plo_codes': plo_codes,
         })
+
+    # Sort answers by PLO code (e.g. PLO 01, PLO 02, ..., PLO 10)
+    detailed_answers.sort(key=lambda item: (item['plo_codes'][0] if item['plo_codes'] else 'ZZZ', item['question_id']))
 
     avg_rating = round(rating_sum / total_ratings, 2) if total_ratings > 0 else None
 

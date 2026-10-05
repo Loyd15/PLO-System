@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.utils import timezone
 
@@ -84,6 +85,13 @@ class Plo(models.Model):
         db_table = 'plo'
         unique_together = (('degree', 'code'),)
         ordering = ['code']
+
+    def save(self, *args, **kwargs):
+        if self.code:
+            match = re.match(r'^PLO\s*(\d+)$', self.code.strip(), re.IGNORECASE)
+            if match:
+                self.code = f"PLO {int(match.group(1)):02d}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.code} - {self.degree.degree_program}"

@@ -4,19 +4,58 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Program Learning Outcome Assessment</title>
-  <link rel="stylesheet" href="{% static 'css/survey.css' %}">
+  <title>Program Learning Outcome Assessment - De La Salle University</title>
+  <link rel="icon" type="image/png" href="{% static 'images/dlsu-logo.png' %}">
+  <link rel="stylesheet" href="{% static 'css/survey.css' %}?v=2">
 </head>
 <body>
   <!-- CSRF Token for Secure AJAX Submission -->
   {% csrf_token %}
 
+  <!-- Informed Consent & Data Privacy Popup Modal -->
+  <div id="consent-modal" class="consent-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="consent-modal-title">
+    <div class="consent-modal-dialog">
+      <div class="consent-header">
+        <h1 id="consent-modal-title" class="consent-title">Before you begin</h1>
+        <p class="consent-subtitle">Please read the information below. You need to agree before starting the survey.</p>
+      </div>
+
+      <section class="card consent-info-card">
+        <div class="consent-section">
+          <h2 class="consent-section-title">Informed consent</h2>
+          <p class="consent-section-text">[Placeholder: informed consent text to be provided by the program office.]</p>
+        </div>
+
+        <div class="consent-divider"></div>
+
+        <div class="consent-section">
+          <h2 class="consent-section-title">Data privacy</h2>
+          <p class="consent-section-text">[Placeholder: data privacy statement to be provided by the program office.]</p>
+          <a href="#" class="consent-privacy-link">Read the full terms and De La Salle University Data Privacy Notice</a>
+        </div>
+      </section>
+
+      <section id="consent-toggle-card" class="card consent-agree-card">
+        <span id="consent-agree-label" class="consent-agree-text">
+          I have read the information above and agree to take part in this survey.
+        </span>
+        <button id="consent-toggle" type="button" class="consent-switch" role="switch" aria-checked="false" aria-labelledby="consent-agree-label">
+          <span class="consent-switch-thumb"></span>
+        </button>
+      </section>
+
+      <div class="consent-actions">
+        <button id="btn-consent-continue" type="button" class="btn-primary" disabled>Continue to survey</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="app-header">
     <div class="header-top">
       <div class="header-brand">
-        <div class="logo-badge">[L]</div>
-        <span class="university-title">[University]</span>
+        <img src="{% static 'images/dlsu-logo.png' %}" alt="De La Salle University" class="university-logo">
+        <span class="university-title">De La Salle University</span>
       </div>
       <div class="header-title">PLO Survey</div>
       <div></div>
@@ -198,7 +237,7 @@
             <section class="card" style="margin-top: 16px;">
               <label for="d-comment" class="card-title">General remarks <span style="font-weight: 400; color: #5F6B65;">(optional)</span></label>
               <p class="card-subtitle">Additional observations regarding strengths or areas for development:</p>
-              <textarea id="d-comment" class="form-textarea" rows="4" maxlength="1000" placeholder="Type comments here..."></textarea>
+              <textarea id="d-comment" class="form-input form-textarea" rows="3" maxlength="1000" placeholder="Type comments here..."></textarea>
             </section>
           </div>
 
@@ -214,7 +253,7 @@
         </div>
 
         <p class="form-hint" style="padding: 0 4px; font-size: 13px;">
-          By submitting, you agree to the <a href="#" style="color: var(--color-primary); font-weight: 700;">[University] Data Privacy Notice</a>.
+          By submitting, you agree to the <a href="#" style="color: var(--color-primary); font-weight: 700;">De La Salle University Data Privacy Notice</a>.
         </p>
       </div>
 
