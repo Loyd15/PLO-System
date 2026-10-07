@@ -1,17 +1,20 @@
+version: "3.9"
+
 services:
   db:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_DATABASE: plo_system
+      MYSQL_DATABASE: ${DB_NAME:-plo_system}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./plo-survey-system-1.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "3306:3306"
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./plo-survey.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./plo-survey-data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-password}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,16 +22,16 @@ services:
   web:
     build: .
     restart: always
+    depends_on:
+      db:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       DB_HOST: db
-      DB_PORT: "3306"
+      DB_PORT: 3306
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
 
 volumes:
-  db_data:
+  mysql_data:

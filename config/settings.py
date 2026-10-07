@@ -114,7 +114,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # ==============================================================================
-# DATABASE CONFIGURATION
+# DATABASE CONFIGURATION (MySQL)
 # ==============================================================================
 
 DATABASES = {
@@ -129,7 +129,7 @@ DATABASES = {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
-        # Re-use database connections in production for better performance
+        # Reuse database connections across requests (5 minutes) for better performance
         'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '300')),
     }
 }
